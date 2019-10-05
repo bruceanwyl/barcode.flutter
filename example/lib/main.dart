@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
         codeList: [
           BarCodeItem(
             type: BarCodeType.Code39,
-            codeStr: "CODE39",
+            codeStr: "62733538535715976",
             description: "Code39 with text",
             hasText: true,
           ),

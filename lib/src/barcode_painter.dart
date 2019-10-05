@@ -107,6 +107,13 @@ class BarCodePainter extends CustomPainter {
     final painter = Paint()..style = PaintingStyle.fill;
     double height = hasText ? size.height * 0.85 : size.height;
 
+    // Algorithm copied from BarcodeImage, a Widget...
+    // Far from ideal, but too much refactoring required otherwise.
+    double calculatedWidth = (data.length + 2) * 13 * lineWidth - lineWidth;
+    double scaledLineWidth = lineWidth;
+    if (calculatedWidth > size.width) {
+      scaledLineWidth = lineWidth * size.width / calculatedWidth;
+    }
     for (int i = 0; i < data.length; i++) {
       switch (data[i]) {
         case '0':
@@ -256,7 +263,8 @@ class BarCodePainter extends CustomPainter {
       }
 
       for (int j = 0; j < 12; j++) {
-        Rect rect = Rect.fromLTWH(13 * lineWidth + 13 * i * lineWidth + j * lineWidth, 0.0, lineWidth, height);
+        Rect rect = Rect.fromLTWH(
+            13 * scaledLineWidth + 13 * i * scaledLineWidth + j * scaledLineWidth, 0.0, scaledLineWidth, height);
         ((0x800 & (binSet[codeValue] << j)) == 0x800)
             ? painter.color = this.foregroundColor
             : painter.color = this.backgroundColor;
@@ -265,7 +273,7 @@ class BarCodePainter extends CustomPainter {
     }
 
     for (int i = 0; i < 12; i++) {
-      Rect rect = Rect.fromLTWH(i * lineWidth, 0.0, lineWidth, height);
+      Rect rect = Rect.fromLTWH(i * scaledLineWidth, 0.0, scaledLineWidth, height);
       ((0x800 & (binSet[43] << i)) == 0x800)
           ? painter.color = this.foregroundColor
           : painter.color = this.backgroundColor;
@@ -273,7 +281,8 @@ class BarCodePainter extends CustomPainter {
     }
 
     for (int i = 0; i < 12; i++) {
-      Rect rect = Rect.fromLTWH((13 + i) * lineWidth + 13 * (data.length) * lineWidth, 0.0, lineWidth, height);
+      Rect rect = Rect.fromLTWH(
+          (13 + i) * scaledLineWidth + 13 * (data.length) * scaledLineWidth, 0.0, scaledLineWidth, height);
       ((0x800 & (binSet[43] << i)) == 0x800)
           ? painter.color = this.foregroundColor
           : painter.color = this.backgroundColor;
@@ -285,7 +294,8 @@ class BarCodePainter extends CustomPainter {
         TextSpan span = TextSpan(style: TextStyle(color: this.foregroundColor, fontSize: 15.0), text: data[i]);
         TextPainter textPainter = TextPainter(text: span, textAlign: TextAlign.left, textDirection: TextDirection.ltr);
         textPainter.layout();
-        textPainter.paint(canvas, Offset((size.width - data.length * 13 * lineWidth) / 2 + 13 * i * lineWidth, height));
+        textPainter.paint(
+            canvas, Offset((size.width - data.length * 13 * scaledLineWidth) / 2 + 13 * i * scaledLineWidth, height));
       }
     }
   }
